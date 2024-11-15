@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Konversi Kalimat</title>
+  </head>
+  <body>
+    <h3>Masukkan Kalimat:</h3>
+    <form id="inputKata">
+      <input type="text" id="kata" placeholder="Masukkan kalimat" />
+      <button type="submit">Konversi</button>
+    </form>
+    <h4>Step 1:</h4>
+    <p>Hasil Konversi: <span id="hasilKonversi"></span></p>
+
+    <h4>Step 2:</h4>
+    <p>Penjabaran Operasi: <span id="penjabaranOperasi"></span></p>
+    <p>Hasil Operasi: <span id="hasilOperasi"></span></p>
+
+    <h4>Step 3:</h4>
+    <p>Hasil Huruf: <span id="hasilHuruf"></span></p>
+
+    <h4>Step 4:</h4>
+    <p>Penjabaran Operasi Baru: <span id="penjabaranOperasiBaru"></span></p>
+    <p>Hasil Angka: <span id="hasilAngka"></span></p>
+    <p>Hasil Huruf Baru: <span id="hasilHurufBaru"></span></p>
+
+    <h4>Step 5:</h4>
+    <p>Konversi Huruf Dari Step 4: <span id="konversiHurufBaru"></span></p>
+    <p>Hasil Penjabaran Angka Dari Huruf Baru: <span id="hasilAngkaPalingBaru"></span></p>
+
+    <script>
+      const kamus = {
+        A: "0",
+        B: "1",
+        C: "1",
+        D: "1",
+        E: "2",
+        F: "3",
+        G: "3",
+        H: "3",
+        I: "4",
+        J: "5",
+        K: "5",
+        L: "5",
+        M: "5",
+        N: "5",
+        O: "6",
+        P: "7",
+        Q: "7",
+        R: "7",
+        S: "7",
+        T: "7",
+        U: "8",
+        V: "9",
+        W: "9",
+        X: "9",
+        Y: "9",
+        Z: "9",
+        a: "9",
+        b: "8",
+        c: "8",
+        d: "8",
+        e: "7",
+        f: "6",
+        g: "6",
+        h: "6",
+        i: "5",
+        j: "4",
+        k: "4",
+        l: "4",
+        m: "4",
+        n: "4",
+        o: "3",
+        p: "2",
+        q: "2",
+        r: "2",
+        s: "2",
+        t: "2",
+        u: "1",
+        v: "0",
+        w: "0",
+        x: "0",
+        y: "0",
+        z: "0",
+        " ": "0",
+      };
+
+      const reverseKamus = {
+        0: "A",
+        1: "B",
+        2: "E",
+        3: "F",
+        4: "I",
+        5: "J",
+        6: "O",
+        7: "P",
+        8: "U",
+        9: "V",
+      };
+
+      document.getElementById("inputKata").onsubmit = function (event) {
+        event.preventDefault();
+
+        let inputText = document.getElementById("kata").value;
+        let outputText = "";
+
+        for (let char of inputText) {
+          outputText += kamus[char] || "";
+        }
+
+        document.getElementById("hasilKonversi").textContent = outputText;
+
+        let total = parseInt(outputText[0]);
+        let operasiDetail = [parseInt(outputText[0])];
+
+        for (let i = 1; i < outputText.length; i++) {
+          let num = parseInt(outputText[i]);
+          if (i % 2 === 1) {
+            total += num;
+            operasiDetail.push(num);
+          } else {
+            total -= num;
+            operasiDetail.push(-num);
+          }
+        }
+
+        document.getElementById("hasilOperasi").textContent = total;
+
+        let penjabaranString = operasiDetail
+          .map((num, index) => {
+            return index === 0 ? `${num}` : num >= 0 ? `+ ${num}` : `- ${Math.abs(num)}`;
+          })
+          .join(" ");
+        document.getElementById("penjabaranOperasi").textContent = penjabaranString;
+
+        let positiveTotal = Math.abs(total);
+
+        let hasilHurufKembali = "";
+        let runningSum = 0;
+        let currentNum = 0;
+
+        while (runningSum < positiveTotal) {
+          let difference = positiveTotal - runningSum;
+
+          if (currentNum > difference) {
+            currentNum = difference;
+          }
+
+          runningSum += currentNum;
+
+          hasilHurufKembali += reverseKamus[currentNum];
+          console.log(currentNum, "ini current num");
+          currentNum++;
+
+          if (currentNum > 9) {
+            currentNum = 0;
+          }
+        }
+
+        document.getElementById("hasilHuruf").textContent = hasilHurufKembali;
+
+        let angkaKembali = "";
+        for (let char of hasilHurufKembali) {
+          angkaKembali += kamus[char] || "";
+        }
+
+        let totalBaru = parseInt(angkaKembali[0]);
+
+        for (let i = 1; i < angkaKembali.length; i++) {
+          let num = parseInt(angkaKembali[i]);
+          if (i % 2 === 1) {
+            totalBaru += num;
+          } else {
+            totalBaru *= num;
+          }
+        }
+
+        let processSum = 0;
+        let newestNum = 0;
+        let hasilHurufBaru = "";
+
+        while (processSum < totalBaru) {
+          let perbedaan = totalBaru - processSum;
+
+          if (newestNum > perbedaan) {
+            newestNum = perbedaan;
+          }
+
+          processSum += newestNum;
+
+          hasilHurufBaru += reverseKamus[newestNum];
+
+          newestNum++;
+
+          if (newestNum > 9) {
+            newestNum = 0;
+          }
+        }
+
+        document.getElementById("hasilHurufBaru").textContent = hasilHurufBaru;
+
+        let angkaBaru = "";
+        for (let char of hasilHurufBaru) {
+          angkaBaru += kamus[char] || "";
+        }
+
+        let totalPalingBaru = parseInt(angkaBaru[0]);
+        let operasiDetailBaru = [parseInt(angkaBaru[0])];
+        for (let i = 1; i < angkaBaru.length; i++) {
+          let num = parseInt(angkaBaru[i]);
+          if (i % 2 === 1) {
+            totalPalingBaru *= num; 
+            operasiDetailBaru.push(`* ${num}`); 
+          } else {
+            totalPalingBaru += num; 
+            operasiDetailBaru.push(`+ ${num}`); 
+          }
+        }
+
+        let penjabaranOperasiBaru = operasiDetailBaru.join(" ");
+
+        document.getElementById("hasilAngka").textContent = totalPalingBaru;
+        document.getElementById("penjabaranOperasiBaru").textContent = penjabaranOperasiBaru;
+
+        let newSum = 0;
+        let nowNum = 0;
+        let hasilHurufPalingBaru = "";
+
+        while (newSum < totalPalingBaru) {
+          let perbedaan = totalPalingBaru - newSum;
+
+          if (newSum > perbedaan) {
+            nowSum = perbedaan;
+          }
+
+          newSum += nowNum;
+
+          hasilHurufPalingBaru += reverseKamus[nowNum];
+
+          nowNum++;
+
+          if (nowNum > 9) {
+            nowNum = 0;
+          }
+        }
+
+        document.getElementById('konversiHurufBaru').textContent = hasilHurufPalingBaru
+
+        let angkaPalingBaru = "";
+        for (let char of hasilHurufPalingBaru) {
+          angkaPalingBaru += kamus[char] || "";
+        }
+
+        document.getElementById("hasilAngkaPalingBaru").textContent = angkaPalingBaru;
+      };
+    </script>
+  </body>
+</html>
